@@ -1,12 +1,12 @@
+import 'package:e_commerce_app/Utils/Constants/color_constant.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import 'package:getxbase/Utils/Constants/color_constant.dart';
 
 class WidgetConstants {
   ///
   /// This method is used for show text in ui with some prebuild properties
   static Text text(String text,
-      {Color color = ColorConstants.textPrimaryColor,
+      {Color color = ColorConstants.primary,
       FontWeight fontWeight = FontWeight.normal,
       double fontSize = 16.0,
       double letterSpacing = 0.5,

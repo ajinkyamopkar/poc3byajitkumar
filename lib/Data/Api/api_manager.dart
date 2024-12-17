@@ -5,6 +5,7 @@ import 'dart:io';
 import 'package:flutter/foundation.dart';
 import 'package:flutter_easyloading/flutter_easyloading.dart';
 import 'package:get/get.dart';
+import 'package:get_storage/get_storage.dart';
 import 'package:http/http.dart' as http;
 import '../../Utils/Constants/widget_constant.dart';
 import '../Model/error_model.dart';
@@ -20,12 +21,12 @@ class ApiManager {
   ///
   /// Replace base url with this
   ///
-  static const String baseUrl = "https://idealake.com";
+  static const String baseUrl = "http://fashionapp.idealake.com/api";
 
   ///
   /// This method is used for call API for the `GET` method, need to pass API Url endpoint
   ///
-  Future<dynamic> get(String url, {bool isLoaderShow = true}) async {
+  Future<dynamic> get(String url, {bool isLoaderShow = false}) async {
     try {
       if (isLoaderShow) {
         EasyLoading.show(maskType: EasyLoadingMaskType.black);
@@ -35,8 +36,8 @@ class ApiManager {
       /// Declare the header for the request
       ///
       Map<String, String> header = {
-        "Authorization": "Token token_value",
-        'Content-Type': 'application/json',
+        'Authorization': 'Bearer ${GetStorage().read('token')}',
+        // 'Content-Type': 'application/json',
       };
 
       Get.printInfo(info: 'Header - ${header.toString()}');
@@ -55,11 +56,12 @@ class ApiManager {
       return responseJson;
     } on SocketException {
       throw FetchDataException('No Internet connection');
-    } finally {
-      if (isLoaderShow) {
-        EasyLoading.dismiss();
-      }
     }
+    // finally {
+    //   if (isLoaderShow) {
+    //     EasyLoading.dismiss();
+    //   }
+    // }
   }
 
   ///
@@ -67,7 +69,7 @@ class ApiManager {
   ///
   Future<dynamic> post(String url, var parameters,
       {String objcontentType = jsonContentType,
-      bool isLoaderShow = true,
+      bool isLoaderShow = false,
       bool isErrorSnackShow = true}) async {
     try {
       if (isLoaderShow) {
@@ -79,8 +81,8 @@ class ApiManager {
       /// or else pass the authentication token stored on login time
       ///
       Map<String, String> header = {
-        "Authorization": "Token token_value",
-        'Content-Type': 'application/json',
+        'Authorization': 'Bearer ${GetStorage().read('token')}',
+        // 'Content-Type': 'application/json',
       };
 
       Get.printInfo(info: 'Header - ${header.toString()}');
@@ -215,7 +217,7 @@ class ApiManager {
   }
 
   dynamic _returnResponse(http.Response response, {bool isShow = true}) {
-    EasyLoading.dismiss();
+    // EasyLoading.dismiss();
     if (kDebugMode) {
       print(response.statusCode);
     }
@@ -249,27 +251,30 @@ class ApiManager {
         if (isShow) {
           WidgetConstants.errorSnackBar(
             content: ErrorModel.fromJson(
-              json.decode(
-                response.body.toString(),
-              ),
-            ).message!,
+                  json.decode(
+                    response.body.toString(),
+                  ),
+                ).message ??
+                "",
           );
         }
         throw BadRequestException(
           ErrorModel.fromJson(
-            json.decode(
-              response.body.toString(),
-            ),
-          ).message!,
+                json.decode(
+                  response.body.toString(),
+                ),
+              ).message ??
+              "",
         );
 
       case 403:
         throw UnauthorisedException(
           ErrorModel.fromJson(
-            json.decode(
-              response.body.toString(),
-            ),
-          ).message!,
+                json.decode(
+                  response.body.toString(),
+                ),
+              ).message ??
+              "",
         );
 
       case 500:
